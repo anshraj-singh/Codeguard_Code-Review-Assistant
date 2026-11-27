@@ -28,6 +28,7 @@ class CodeReviewResponse(BaseModel):
     review_id: str
     summary: ReviewSummary
     findings: list[Finding]
+    syntax_error: bool = False
 
 
 class ReviewHistoryItem(BaseModel):

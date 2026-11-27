@@ -51,3 +51,51 @@ def test_multiple_issues():
     assert result["summary"]["total_issues"] == 2
     assert result["summary"]["high"] == 1
     assert result["summary"]["low"] == 1
+
+
+def test_ignore_eval_in_comments():
+    code = "# eval(user_input)\nname = 'hello'"
+
+    result = analyze_code(code)
+
+    assert result["summary"]["total_issues"] == 0
+
+def test_ignore_eval_inside_string():
+    code = 'message = "eval(user_input)"'
+
+    result = analyze_code(code)
+
+    assert result["summary"]["total_issues"] == 0
+
+def test_detect_os_system_alias():
+    code = "import os as operating_system\noperating_system.system('dir')"
+
+    result = analyze_code(code)
+
+    assert result["summary"]["high"] == 1
+    assert result["findings"][0]["rule"] == "os_system_usage"
+
+def test_detect_syntax_error():
+    code = "if True print('hello')"
+
+    result = analyze_code(code)
+
+    assert result["syntax_error"] is True
+    assert result["findings"][0]["rule"] == "syntax_error"
+    assert result["summary"]["high"] == 1
+
+def test_detect_imported_system_function():
+    code = "from os import system\nsystem('dir')"
+
+    result = analyze_code(code)
+
+    assert result["summary"]["high"] == 1
+    assert result["findings"][0]["rule"] == "os_system_usage"
+
+def test_detect_eval_and_exec():
+    code = "eval(user_input)\nexec(user_code)"
+
+    result = analyze_code(code)
+
+    assert result["summary"]["high"] == 2
+    assert result["summary"]["total_issues"] == 2

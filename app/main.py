@@ -59,10 +59,11 @@ def create_review(request: CodeReviewRequest):
         )
 
     return {
-        "review_id": review_id,
-        "summary": analysis_result["summary"],
-        "findings": analysis_result["findings"]
-    }
+    "review_id": review_id,
+    "summary": analysis_result["summary"],
+    "findings": analysis_result["findings"],
+    "syntax_error": analysis_result["syntax_error"]
+}
 
 
 @app.get("/api/reviews")
